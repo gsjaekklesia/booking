@@ -1,6 +1,6 @@
 // PWA Service Worker for GSJA Ekklesia Room Booking
 // Updated: 2026-02-16 - Manual Time Picker + Easter Egg
-const CACHE_NAME = 'gsja-booking-v2.0.0';
+const CACHE_NAME = 'gsja-booking-v2.1.0';
 const urlsToCache = [
   './',
   './index.html',
