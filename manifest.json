@@ -2,7 +2,7 @@
   "name": "GSJA Ekklesia Room Booking",
   "short_name": "Room Booking",
   "description": "GSJA Ekklesia Church Room Booking System",
-  "start_url": "/booking/",
+  "start_url": "/booking/login.html",
   "scope": "/booking/",
   "display": "standalone",
   "background_color": "#ffffff",
