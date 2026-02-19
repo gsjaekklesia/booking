@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSJA Ekklesia – Login</title>
+<meta name="description" content="GSJA Ekklesia Church Room Booking System">
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Room Booking">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== CSS VARIABLES ===== */
+:root {
+    --bg:           #f0f4ff;
+    --card-bg:      #ffffff;
+    --card-shadow:  0 24px 64px rgba(0,0,0,0.10);
+    --text-primary: #111827;
+    --text-sub:     #6b7280;
+    --border:       #e5e7eb;
+    --input-bg:     #f9fafb;
+    --btn-guest-bg: #2563eb;
+    --btn-guest-hover: #1d4ed8;
+    --btn-admin-bg: transparent;
+    --btn-admin-border: #d1d5db;
+    --btn-admin-color: #374151;
+    --btn-admin-hover-bg: #f3f4f6;
+    --btn-admin-hover-border: #9ca3af;
+    --btn-submit-bg: #1e293b;
+    --btn-submit-hover: #111827;
+    --expand-bg:    #f8fafc;
+    --expand-border:#e5e7eb;
+    --error-color:  #dc2626;
+    --toggle-bg:    #e5e7eb;
+    --toggle-color: #374151;
+}
+
+[data-theme="dark"] {
+    --bg:           #0f172a;
+    --card-bg:      #1e293b;
+    --card-shadow:  0 24px 64px rgba(0,0,0,0.5);
+    --text-primary: #f1f5f9;
+    --text-sub:     #94a3b8;
+    --border:       #334155;
+    --input-bg:     #0f172a;
+    --btn-guest-bg: #3b82f6;
+    --btn-guest-hover: #2563eb;
+    --btn-admin-bg: transparent;
+    --btn-admin-border: #475569;
+    --btn-admin-color: #cbd5e1;
+    --btn-admin-hover-bg: #334155;
+    --btn-admin-hover-border: #94a3b8;
+    --btn-submit-bg: #334155;
+    --btn-submit-hover: #475569;
+    --expand-bg:    #0f172a;
+    --expand-border:#334155;
+    --error-color:  #f87171;
+    --toggle-bg:    #334155;
+    --toggle-color: #cbd5e1;
+}
+
+/* ===== BASE ===== */
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    min-height: 100dvh; /* dynamic viewport for mobile browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    transition: background 0.3s ease;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--toggle-bg);
+    color: var(--toggle-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ===== CARD ===== */
+.login-card {
+    background: var(--card-bg);
+    border-radius: 28px;
+    padding: 48px 32px 40px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== LOGO ===== */
+.logo-wrap {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 24px;
+}
+
+.logo-wrap img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.logo-light { display: block; }
+.logo-dark  { display: none;  }
+
+[data-theme="dark"] .logo-light { display: none;  }
+[data-theme="dark"] .logo-dark  { display: block; }
+
+/* ===== TITLE ===== */
+.login-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.35;
+    margin-bottom: 36px;
+    letter-spacing: -0.4px;
+    transition: color 0.3s ease;
+}
+
+/* ===== BUTTONS ===== */
+.btn-guest {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--btn-guest-bg);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-guest:hover {
+    background: var(--btn-guest-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(37,99,235,0.35);
+}
+
+.btn-guest:active { transform: scale(0.98); }
+
+.btn-admin-entry {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--btn-admin-bg);
+    color: var(--btn-admin-color);
+    font-size: 16px;
+    font-weight: 600;
+    border: 2px solid var(--btn-admin-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-admin-entry:hover {
+    background: var(--btn-admin-hover-bg);
+    border-color: var(--btn-admin-hover-border);
+    transform: translateY(-1px);
+}
+
+.btn-admin-entry:active { transform: scale(0.98); }
+
+/* ===== ADMIN EXPAND ===== */
+.admin-expand {
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                margin-top 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.admin-expand.open {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 14px;
+}
+
+.admin-expand-inner {
+    background: var(--expand-bg);
+    border: 1.5px solid var(--expand-border);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.login-input {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s, background 0.3s, color 0.3s;
+}
+
+.login-input:focus {
+    border-color: var(--btn-guest-bg);
+}
+
+.login-input::placeholder {
+    color: var(--text-sub);
+}
+
+.btn-admin-submit {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    background: var(--btn-submit-bg);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-admin-submit:hover {
+    background: var(--btn-submit-hover);
+    transform: translateY(-1px);
+}
+
+.login-error {
+    font-size: 13px;
+    color: var(--error-color);
+    text-align: center;
+    min-height: 16px;
+    font-weight: 500;
+}
+
+/* ===== FOOTER NOTE ===== */
+.login-footer {
+    position: fixed;
+    bottom: 16px;
+    left: 0;
+    right: 0;
+    font-size: 12px;
+    color: var(--text-sub);
+    text-align: center;
+    line-height: 1.6;
+    transition: color 0.3s;
+    pointer-events: none;
+}
+
+/* ===== MOBILE OPTIMIZATION ===== */
+@media (max-width: 400px) {
+    .login-card {
+        padding: 40px 24px 32px;
+        border-radius: 24px;
+    }
+    .login-title {
+        font-size: 21px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Theme Toggle (top-left) -->
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">
+    🌙
+</button>
+
+<!-- Login Card -->
+<div class="login-card">
+
+    <!-- Logo (wide, light/dark) -->
+    <div class="logo-wrap">
+        <img src="logo-light.png" alt="GSJA Ekklesia" class="logo-light">
+        <img src="logo-dark.png"  alt="GSJA Ekklesia" class="logo-dark">
+    </div>
+
+    <!-- Title -->
+    <div class="login-title">GSJA Ekklesia<br>Booking System</div>
+
+    <!-- Guest Button -->
+    <button class="btn-guest" onclick="loginAsGuest()">👤 Masuk sebagai Guest</button>
+
+    <!-- Admin Button -->
+    <button class="btn-admin-entry" id="btnAdminEntry" onclick="toggleAdminExpand()">🔐 Masuk sebagai Admin</button>
+
+    <!-- Expanding Admin Password Area -->
+    <div class="admin-expand" id="adminExpand">
+        <div class="admin-expand-inner">
+            <input  type="password"
+                    id="adminPassword"
+                    class="login-input"
+                    placeholder="Enter admin password"
+                    onkeypress="if(event.key==='Enter') loginAsAdmin()">
+            <div class="login-error" id="loginError"></div>
+            <button class="btn-admin-submit" onclick="loginAsAdmin()">Login</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="login-footer">
+    © 2026 GSJA Ekklesia Church · Room Booking System
+</div>
+
+<script>
+// ===== THEME =====
+const htmlEl = document.documentElement;
+const themeToggleBtn = document.getElementById('themeToggle');
+
+function applyTheme(theme) {
+    htmlEl.setAttribute('data-theme', theme);
+    themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+    const current = htmlEl.getAttribute('data-theme');
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// Init theme: localStorage → OS preference
+(function initTheme() {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+        applyTheme(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme('dark');
+    } else {
+        applyTheme('light');
+    }
+})();
+
+// ===== ADMIN EXPAND =====
+let adminOpen = false;
+
+function toggleAdminExpand() {
+    adminOpen = !adminOpen;
+    const expand = document.getElementById('adminExpand');
+    if (adminOpen) {
+        expand.classList.add('open');
+        setTimeout(() => document.getElementById('adminPassword').focus(), 380);
+    } else {
+        expand.classList.remove('open');
+        document.getElementById('loginError').textContent = '';
+    }
+}
+
+// ===== GUEST LOGIN =====
+function loginAsGuest() {
+    localStorage.setItem('userRole', 'guest');
+    window.location.href = 'index.html';
+}
+
+// ===== ADMIN LOGIN =====
+// We load the admin password from Supabase before allowing login
+let ADMIN_PASSWORD = null;
+
+async function loadAdminPassword() {
+    try {
+        const SUPABASE_URL = "https://fyjdvqfquzkfoympyhte.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5amR2cWZxdXprZm95bXB5aHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NjI2MjYsImV4cCI6MjA4NjUzODYyNn0.MzYfNxZvjNn7h-yIWMWh6tmSrY7zr_evAQe8BOBIuRo";
+        const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+        if (!sb) return; // Supabase not loaded yet, will use fallback
+
+        const { data, error } = await sb
+            .from('admin_settings')
+            .select('admin_password')
+            .eq('id', 1)
+            .single();
+
+        if (!error && data && data.admin_password) {
+            ADMIN_PASSWORD = data.admin_password;
+        }
+    } catch (e) {
+        console.warn('Could not load admin password from DB:', e);
+    }
+}
+
+function loginAsAdmin() {
+    const pw = document.getElementById('adminPassword').value;
+    const errorEl = document.getElementById('loginError');
+
+    if (!pw) {
+        errorEl.textContent = 'Please enter the admin password.';
+        return;
+    }
+
+    if (ADMIN_PASSWORD === null) {
+        // Password not yet loaded from DB — fallback check happens in index.html
+        // Just store password attempt and let index.html validate
+        localStorage.setItem('userRole', 'admin_pending');
+        localStorage.setItem('adminAttempt', pw);
+        window.location.href = 'index.html';
+        return;
+    }
+
+    if (pw === ADMIN_PASSWORD) {
+        localStorage.setItem('userRole', 'admin');
+        localStorage.removeItem('adminAttempt');
+        window.location.href = 'index.html';
+    } else {
+        errorEl.textContent = 'Incorrect password. Please try again.';
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('adminPassword').focus();
+    }
+}
+
+// ===== CHECK IF ALREADY LOGGED IN =====
+(function checkSession() {
+    const role = localStorage.getItem('userRole');
+    if (role === 'guest' || role === 'admin') {
+        window.location.href = 'index.html';
+    }
+})();
+
+// Load Supabase to validate admin password on this page
+const supabaseScript = document.createElement('script');
+supabaseScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+supabaseScript.onload = () => loadAdminPassword();
+document.head.appendChild(supabaseScript);
+</script>
+
+</body>
+</html>
