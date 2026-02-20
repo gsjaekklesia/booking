@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSJA Ekklesia Room Booking</title>
+
+<!-- PWA Meta Tags -->
+<meta name="description" content="GSJA Ekklesia Church Room Booking System">
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Room Booking">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===== REDIRECT GUARD (handled by JS below) ===== -->
+
+<div class="wrapper">
+<div class="card">
+
+<div class="header">
+    <!-- Scene background layer -->
+    <div id="timeScene" class="time-scene" aria-hidden="true">
+    <!-- Morning Scene (5am - 10am) -->
+    <svg id="sceneMorning" class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 80" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" style="position:absolute;top:0;left:0;">
+        <defs>
+            <linearGradient id="mgSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fed7aa"/>
+                <stop offset="50%" stop-color="#fde68a"/>
+                <stop offset="100%" stop-color="#bfdbfe"/>
+            </linearGradient>
+            <radialGradient id="mgSun" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="100%" stop-color="#fb923c"/>
+            </radialGradient>
+        </defs>
+        <!-- Sky -->
+        <rect width="800" height="80" fill="url(#mgSky)"/>
+        <!-- Sun rising on right -->
+        <circle cx="680" cy="72" r="36" fill="url(#mgSun)" opacity="0.9"/>
+        <circle cx="680" cy="72" r="44" fill="#fb923c" opacity="0.15"/>
+        <!-- Horizon hills -->
+        <ellipse cx="100" cy="85" rx="160" ry="28" fill="#86efac" opacity="0.6"/>
+        <ellipse cx="320" cy="88" rx="200" ry="24" fill="#4ade80" opacity="0.5"/>
+        <ellipse cx="580" cy="86" rx="180" ry="22" fill="#86efac" opacity="0.55"/>
+        <!-- Clouds -->
+        <g opacity="0.85" class="cloud-drift">
+            <ellipse cx="180" cy="22" rx="48" ry="14" fill="white"/>
+            <ellipse cx="210" cy="18" rx="32" ry="12" fill="white"/>
+            <ellipse cx="155" cy="20" rx="28" ry="10" fill="white"/>
+        </g>
+        <g opacity="0.7" class="cloud-drift-slow">
+            <ellipse cx="440" cy="30" rx="38" ry="11" fill="white"/>
+            <ellipse cx="465" cy="26" rx="26" ry="10" fill="white"/>
+            <ellipse cx="420" cy="29" rx="22" ry="8" fill="white"/>
+        </g>
+        <!-- Birds -->
+        <g fill="none" stroke="#374151" stroke-width="1.2" opacity="0.5">
+            <path d="M260 18 Q264 14 268 18"/>
+            <path d="M272 15 Q276 11 280 15"/>
+            <path d="M290 22 Q294 18 298 22"/>
+        </g>
+    </svg>
+
+    <!-- Afternoon Scene (10am - 3pm) -->
+    <svg id="sceneAfternoon" class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 80" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" style="position:absolute;top:0;left:0;">
+        <defs>
+            <linearGradient id="agSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="60%" stop-color="#7dd3fc"/>
+                <stop offset="100%" stop-color="#bae6fd"/>
+            </linearGradient>
+            <radialGradient id="agSun" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef9c3"/>
+                <stop offset="100%" stop-color="#fde047"/>
+            </radialGradient>
+        </defs>
+        <!-- Sky -->
+        <rect width="800" height="80" fill="url(#agSky)"/>
+        <!-- Sun high up -->
+        <circle cx="400" cy="-8" r="40" fill="url(#agSun)" opacity="0.95"/>
+        <circle cx="400" cy="-8" r="54" fill="#fde047" opacity="0.12"/>
+        <!-- Fluffy clouds -->
+        <g opacity="0.95">
+            <ellipse cx="140" cy="28" rx="56" ry="16" fill="white"/>
+            <ellipse cx="170" cy="20" rx="38" ry="15" fill="white"/>
+            <ellipse cx="112" cy="25" rx="32" ry="12" fill="white"/>
+            <ellipse cx="195" cy="24" rx="24" ry="10" fill="#f0f9ff"/>
+        </g>
+        <g opacity="0.9">
+            <ellipse cx="580" cy="22" rx="62" ry="17" fill="white"/>
+            <ellipse cx="612" cy="14" rx="42" ry="16" fill="white"/>
+            <ellipse cx="550" cy="20" rx="36" ry="13" fill="white"/>
+            <ellipse cx="638" cy="20" rx="26" ry="11" fill="#f0f9ff"/>
+        </g>
+        <g opacity="0.7">
+            <ellipse cx="340" cy="42" rx="34" ry="10" fill="white"/>
+            <ellipse cx="358" cy="37" rx="22" ry="9" fill="white"/>
+        </g>
+        <!-- Ground -->
+        <ellipse cx="200" cy="88" rx="240" ry="20" fill="#4ade80" opacity="0.35"/>
+        <ellipse cx="650" cy="86" rx="200" ry="18" fill="#86efac" opacity="0.3"/>
+    </svg>
+
+    <!-- Evening Scene (3pm - 6pm) -->
+    <svg id="sceneEvening" class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 80" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" style="position:absolute;top:0;left:0;">
+        <defs>
+            <linearGradient id="egSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7c3aed"/>
+                <stop offset="35%" stop-color="#c2410c"/>
+                <stop offset="65%" stop-color="#f97316"/>
+                <stop offset="100%" stop-color="#fde68a"/>
+            </linearGradient>
+            <radialGradient id="egSun" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="60%" stop-color="#fb923c"/>
+                <stop offset="100%" stop-color="#dc2626" stop-opacity="0"/>
+            </radialGradient>
+        </defs>
+        <!-- Sky -->
+        <rect width="800" height="80" fill="url(#egSky)"/>
+        <!-- Setting sun on left -->
+        <circle cx="120" cy="72" r="34" fill="#fde047" opacity="0.92"/>
+        <circle cx="120" cy="72" r="50" fill="url(#egSun)" opacity="0.3"/>
+        <!-- Silhouette hills -->
+        <ellipse cx="0" cy="90" rx="180" ry="32" fill="#1e1b4b" opacity="0.7"/>
+        <ellipse cx="250" cy="92" rx="220" ry="28" fill="#1e1b4b" opacity="0.65"/>
+        <ellipse cx="550" cy="90" rx="250" ry="30" fill="#1e1b4b" opacity="0.7"/>
+        <ellipse cx="820" cy="88" rx="180" ry="26" fill="#1e1b4b" opacity="0.6"/>
+        <!-- Dramatic clouds -->
+        <g opacity="0.6">
+            <ellipse cx="380" cy="20" rx="80" ry="14" fill="#7c3aed" opacity="0.5"/>
+            <ellipse cx="420" cy="14" rx="50" ry="12" fill="#9333ea" opacity="0.4"/>
+        </g>
+        <g opacity="0.5">
+            <ellipse cx="600" cy="28" rx="60" ry="11" fill="#c2410c" opacity="0.6"/>
+            <ellipse cx="635" cy="22" rx="38" ry="10" fill="#ea580c" opacity="0.5"/>
+        </g>
+        <!-- Light rays from sun -->
+        <line x1="120" y1="72" x2="280" y2="10" stroke="#fde047" stroke-width="1" opacity="0.15"/>
+        <line x1="120" y1="72" x2="320" y2="30" stroke="#fde047" stroke-width="1.5" opacity="0.1"/>
+        <line x1="120" y1="72" x2="200" y2="5" stroke="#fde047" stroke-width="1" opacity="0.12"/>
+    </svg>
+
+    <!-- Night Scene (6pm - 5am) -->
+    <svg id="sceneNight" class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 80" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" style="position:absolute;top:0;left:0;">
+        <defs>
+            <linearGradient id="ngSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#020617"/>
+                <stop offset="50%" stop-color="#0f172a"/>
+                <stop offset="100%" stop-color="#1e1b4b"/>
+            </linearGradient>
+        </defs>
+        <!-- Sky -->
+        <rect width="800" height="80" fill="url(#ngSky)"/>
+        <!-- Stars - static -->
+        <circle cx="60" cy="12" r="1.2" fill="white" opacity="0.9" class="star-twinkle"/>
+        <circle cx="130" cy="8" r="0.9" fill="white" opacity="0.7" class="star-twinkle-slow"/>
+        <circle cx="200" cy="18" r="1.4" fill="white" opacity="0.85" class="star-twinkle"/>
+        <circle cx="280" cy="6" r="1" fill="white" opacity="0.75"/>
+        <circle cx="340" cy="15" r="1.2" fill="white" opacity="0.9" class="star-twinkle-slow"/>
+        <circle cx="390" cy="5" r="0.8" fill="white" opacity="0.6"/>
+        <circle cx="450" cy="20" r="1.3" fill="white" opacity="0.8" class="star-twinkle"/>
+        <circle cx="510" cy="9" r="1" fill="white" opacity="0.7"/>
+        <circle cx="570" cy="14" r="1.5" fill="white" opacity="0.95" class="star-twinkle-slow"/>
+        <circle cx="630" cy="7" r="0.9" fill="white" opacity="0.65"/>
+        <circle cx="690" cy="18" r="1.2" fill="white" opacity="0.8" class="star-twinkle"/>
+        <circle cx="750" cy="10" r="1" fill="white" opacity="0.7"/>
+        <circle cx="90" cy="35" r="0.8" fill="white" opacity="0.5"/>
+        <circle cx="170" cy="40" r="1" fill="white" opacity="0.6" class="star-twinkle"/>
+        <circle cx="310" cy="32" r="0.7" fill="white" opacity="0.55"/>
+        <circle cx="480" cy="38" r="1.1" fill="white" opacity="0.65" class="star-twinkle-slow"/>
+        <circle cx="660" cy="35" r="0.9" fill="white" opacity="0.6"/>
+        <circle cx="720" cy="28" r="1.2" fill="white" opacity="0.75" class="star-twinkle"/>
+        <!-- Moon -->
+        <circle cx="680" cy="20" r="18" fill="#fef9c3" opacity="0.95"/>
+        <circle cx="688" cy="14" r="14" fill="#0f172a" opacity="0.92"/>
+        <!-- Moon glow -->
+        <circle cx="680" cy="20" r="28" fill="#fef9c3" opacity="0.06"/>
+        <!-- Silhouette hills -->
+        <ellipse cx="100" cy="92" rx="200" ry="28" fill="#020617" opacity="0.9"/>
+        <ellipse cx="400" cy="94" rx="280" ry="26" fill="#020617" opacity="0.85"/>
+        <ellipse cx="720" cy="90" rx="200" ry="24" fill="#020617" opacity="0.9"/>
+        <!-- Building silhouettes -->
+        <rect x="30" y="55" width="12" height="25" fill="#020617" opacity="0.8"/>
+        <rect x="46" y="48" width="18" height="32" fill="#020617" opacity="0.8"/>
+        <rect x="68" y="60" width="10" height="20" fill="#020617" opacity="0.8"/>
+        <!-- Lights in buildings -->
+        <rect x="50" y="54" width="4" height="3" fill="#fef08a" opacity="0.7"/>
+        <rect x="57" y="62" width="4" height="3" fill="#fef08a" opacity="0.5"/>
+    </svg>
+</div>
+
+    <!-- Content layer on top of scene -->
+    <div class="header-content">
+        <div class="title-container">
+            <img src="logo-light.png" alt="GSJA Ekklesia Logo" class="church-logo logo-light">
+            <img src="logo-dark.png" alt="GSJA Ekklesia Logo" class="church-logo logo-dark">
+            <div>
+                <div class="title" data-translate="title">GSJA Ekklesia Room Booking</div>
+                <span id="headerRoleBadge" class="role-badge guest">Guest</span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="icon-btn" onclick="openSidebar()" title="Menu">☰</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar Menu -->
+<div class="sidebar-menu" id="sidebarMenu">
+    <div class="sidebar-header">
+        <div class="sidebar-title" data-translate="menuTitle">Menu</div>
+        <button class="close-sidebar" onclick="closeSidebar()">✕</button>
+    </div>
+    
+    <div class="sidebar-content">
+        <!-- Language Selector -->
+        <div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;">
+            <label style="font-size:13px;font-weight:600;color:#6b7280;display:block;margin-bottom:8px;" data-translate="languageLabel">Language</label>
+            <select id="languageSelect" onchange="changeLanguage(this.value)" style="width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;font-size:15px;">
+                <option value="id">Indonesian</option>
+                <option value="en">English</option>
+                <option value="zh">中文 (简体)</option>
+            </select>
+        </div>
+        
+        <!-- Search Button -->
+        <button class="menu-item" onclick="openSearchModal(); closeSidebar();">
+            <span class="menu-item-icon">Search</span>
+            <span data-translate="searchAndFilter">Search & Filter</span>
+        </button>
+        
+        <div class="menu-divider"></div>
+        
+        <!-- Admin Badge (shown when logged in as admin) -->
+        <div id="sidebarAdminBadge" style="display:none;padding:12px 20px;background:#dcfce7;color:#166534;font-weight:600;font-size:14px;">
+            <span data-translate="admin">ADMIN</span> ✓
+        </div>
+
+        <!-- Guest Badge -->
+        <div id="sidebarGuestBadge" style="display:none;padding:12px 20px;background:#eff6ff;color:#1d4ed8;font-weight:600;font-size:14px;">
+            Guest
+        </div>
+        
+        <button class="menu-item" id="menuChangePassword" onclick="openChangePassword(); closeSidebar();" style="display:none;">
+            <span class="menu-item-icon">Key</span>
+            <span data-translate="changePassword">Change Password</span>
+        </button>
+        
+        <!-- Logout always visible -->
+        <button class="menu-item" id="menuLogout" onclick="logoutToLoginPage(); closeSidebar();">
+            <span class="menu-item-icon">Out</span>
+            <span data-translate="logout">Logout</span>
+        </button>
+        
+        <div class="menu-divider"></div>
+        
+        <!-- Push Notifications Toggle -->
+        <button class="menu-item" id="notificationToggle" onclick="togglePushNotifications()">
+            <span class="menu-item-icon">Bell</span>
+            <span id="notificationStatus" data-translate="enableNotifications">Enable Notifications</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="menu-item" onclick="toggleTheme()">
+            <span class="menu-item-icon" id="themeIcon">Dark</span>
+            <span id="themeLabel">Dark Mode</span>
+        </button>
+        
+        <button class="menu-item" onclick="showAbout(); closeSidebar();">
+            <span class="menu-item-icon">Info</span>
+            <span data-translate="about">About</span>
+        </button>
+    </div>
+</div>
+
+
+<!-- SKELETON LOADER -->
+<div id="skeletonLoader" class="skeleton-wrap">
+    <div class="skeleton-bar short"></div>
+    <div class="skeleton-bar tall"></div>
+    <div class="skeleton-bar medium" style="margin-top:12px"></div>
+    <div class="skeleton-bar full"></div>
+    <div class="skeleton-bar short"></div>
+</div>
+
+<div id="calendar" style="display:none;"></div>
+
+<!-- EMPTY STATE -->
+<div class="empty-state" id="emptyState">
+    <div class="empty-state-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+    </div>
+    <div class="empty-state-title">Belum ada booking</div>
+    <div class="empty-state-sub">Kalender masih kosong. Tekan tombol + untuk membuat booking pertama!</div>
+    <button class="empty-state-btn" onclick="openCreateSheet()">+ Buat Booking</button>
+</div>
+
+<!-- DIVISION COLOR LEGEND -->
+<div class="legend-wrap" id="legendWrap">
+    <div class="legend-title">Warna Komisi</div>
+    <div class="legend-grid" id="legendGrid"></div>
+</div>
+
+</div>
+</div>
+
+<footer style="background:var(--footer-bg);padding:20px;text-align:center;margin-top:40px;border-top:2px solid var(--footer-border);transition:background 0.3s ease;">
+    <p style="margin:0;color:var(--text-muted);font-size:14px;">
+        © 2026 GSJA Ekklesia Church
+    </p>
+    <p style="margin:5px 0 0 0;color:var(--text-faint);font-size:12px;">
+        Room Booking System <!-- By Vincentius Bramasta Hartono-->
+    </p>
+</footer>
+
+<div class="fab" onclick="openCreateSheet()">+</div>
+<div id="fabTip" class="fab-tip" style="display:none">Create booking</div>
+
+<!-- FIRST TIME HINT -->
+<div id="hintOverlay" class="hint-overlay">
+    <div class="hint-box">
+        <div class="hint-title">Cara membuat booking</div>
+        <div style="text-align:left; line-height:1.8;">
+        <b>Pilihan 1:</b> Klik tanggal / drag di kalender<br>
+        <b>Pilihan 2:</b> Tekan tombol <span style="display:inline-block;background:#2563eb;color:white;width:32px;height:32px;border-radius:50%;text-align:center;line-height:32px;font-size:24px;font-weight:bold;">+</span> di kanan bawah
+        <br><br>
+        <div style="background:#fef3c7;padding:12px;border-radius:8px;font-size:13px;">
+        <b>Penting:</b> Jika ada booking di waktu yang sama, gunakan tombol <b>+</b> untuk membuat booking di ruangan lain!
+        </div>
+        </div>
+        <button class="hint-btn" onclick="closeHint()">Mengerti</button>
+    </div>
+</div>
+
+<!-- overlay -->
+<div class="sheet-overlay" id="overlay" onclick="closeSheets()"></div>
+
+<!-- CREATE SHEET -->
+<div class="bottom-sheet" id="createSheet">
+<div class="handle"></div>
+<div class="sheet-title">Create Booking</div>
+
+<select id="division" required>
+<option value="">Komisi</option>
+<option>Kebaktian</option><option>Sekolah Minggu</option><option>11DG</option>
+<option>Alive</option><option>Kaum Pria</option><option>Kaum Wanita</option><option>Kaum Lansia</option>
+<option>Usher</option><option>Diakonia</option><option>Dept Injil</option>
+<option>Dept Misi</option><option>AGBF</option><option>Kewirausahaan</option>
+<option>Publikasi</option><option>Tata Graha</option><option>Fasilitas</option>
+<option>Tim Doa</option><option>ESP</option>
+</select>
+
+ <select id="room" required>
+        <option value="">Room</option>
+        <option>Hall Utama</option><option>Ruang Kaca Lt2</option><option>Ruang SM Spesial</option>
+		<option>Ruang Teen</option><option>Office</option><option>Studio</option>
+        <option>Ruang Makan Lt2</option>
+        <option>Rooftop</option>
+        <option>Kamar Tidur Lt3</option>
+        <option>Multifungsi Hall Lt1</option>
+    </select>
+
+<input id="activity" placeholder="Activity name" required>
+<textarea id="notes" placeholder="Notes (optional)"></textarea>
+
+<div style="font-size:13px;color:#374151;margin-bottom:12px">
+<b>Option 1:</b> Pilih tanggal di kalender, atau<br>
+<b>Option 2:</b> Isi manual di bawah ini
+</div>
+
+<!-- DATE AND TIME PICKER (Always visible) -->
+<div style="margin-bottom:16px;">
+    <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Tanggal</label>
+    <input type="date" id="manualDate" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div>
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Jam Mulai</label>
+        <input type="time" id="startTime" value="08:00" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+    </div>
+    <div>
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Jam Selesai</label>
+        <input type="time" id="endTime" value="17:00" style="width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+    </div>
+</div>
+
+<div style="font-size:11px;color:#6b7280;margin-bottom:12px;background:#f3f4f6;padding:8px;border-radius:6px;">
+Semua waktu dalam zona waktu Indonesia (WIB/UTC+7)
+</div>
+
+<div id="selectedTime" style="font-weight:600;margin-bottom:10px;color:#059669;font-size:13px;display:none;">✓ Waktu dari kalender dipilih</div>
+
+<!-- Silent Mode for Admins -->
+<div id="silentModeContainer" style="display:none;margin:12px 0;padding:12px;background:#fef3c7;border-radius:8px;border:1px solid #fbbf24;">
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#92400e;">
+        <input type="checkbox" id="silentMode" style="width:auto;margin:0;">
+        <span>Silent Mode (No Notification)</span>
+    </label>
+    <div style="font-size:11px;color:#92400e;margin-top:4px;margin-left:24px;">
+        For testing only - others won't be notified
+    </div>
+</div>
+
+<button class="primary" style="width:100%" onclick="createBooking()">Create Booking</button>
+</div>
+
+<!-- VIEW SHEET -->
+<div class="bottom-sheet" id="viewSheet">
+<div class="handle"></div>
+<div id="modalTitle" class="sheet-title"></div>
+<div id="modalBody"></div>
+
+<div class="sheet-buttons" id="adminBtns" style="display:none">
+<button class="edit" onclick="openEditSheet()">Edit</button>
+<button class="delete" onclick="deleteBooking()">Delete</button>
+</div>
+</div>
+
+<!-- EDIT SHEET -->
+<div class="bottom-sheet" id="editSheet">
+<div class="handle"></div>
+<div class="sheet-title">Edit Booking</div>
+
+<select id="editDivision" required>
+<option value="">Komisi</option>
+<option>Kebaktian</option><option>Sekolah Minggu</option><option>11DG</option>
+<option>Alive</option><option>Kaum Pria</option><option>Kaum Wanita</option><option>Kaum Lansia</option>
+<option>Usher</option><option>Diakonia</option><option>Dept Injil</option>
+<option>Dept Misi</option><option>AGBF</option><option>Kewirausahaan</option>
+<option>Publikasi</option><option>Tata Graha</option><option>Fasilitas</option>
+<option>Tim Doa</option><option>ESP</option>
+</select>
+
+<select id="editRoom" required>
+<option value="">Room</option>
+<option>Hall Utama</option><option>Ruang Kaca Lt2</option><option>Ruang SM Spesial</option>
+<option>Ruang Teen</option><option>Office</option><option>Studio</option>
+<option>Ruang Makan Lt2</option>
+<option>Rooftop</option>
+<option>Multifungsi Hall Lt1</option>
+<option>Ruang Doa</option>
+<option>Ruang Youth Lt1</option>
+</select>
+
+<input type="text" id="editActivity" placeholder="Nama aktivitas" required>
+<textarea id="editNotes" placeholder="Catatan (optional)" rows="3"></textarea>
+
+<div style="font-size:13px;color:#374151;margin-bottom:6px">
+<b>Waktu Booking</b>
+</div>
+
+<label style="font-size:13px">Tanggal Mulai</label>
+<input type="date" id="editStartDate" required>
+
+<label style="font-size:13px">Jam Mulai (Waktu Indonesia/WIB)</label>
+<input type="time" id="editStartTime" required>
+
+<label style="font-size:13px">Tanggal Selesai</label>
+<input type="date" id="editEndDate" required>
+
+<label style="font-size:13px">Jam Selesai (Waktu Indonesia/WIB)</label>
+<input type="time" id="editEndTime" required>
+
+<div style="font-size:11px;color:#6b7280;margin-top:4px;margin-bottom:12px">
+Semua waktu dalam zona waktu Indonesia (WIB/UTC+7)
+</div>
+
+<div class="sheet-buttons">
+<button class="secondary" onclick="closeEditSheet()">Cancel</button>
+<button class="primary" onclick="saveEditedBooking()">Save Changes</button>
+</div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="login-modal" id="changePasswordModal">
+    <div class="login-box">
+        <div class="login-title">Change Password</div>
+        <input type="password" id="currentPassword" class="login-input" placeholder="Current Password">
+        <input type="password" id="newPassword" class="login-input" placeholder="New Password">
+        <input type="password" id="confirmPassword" class="login-input" placeholder="Confirm New Password">
+        <div class="login-buttons">
+            <button class="secondary" onclick="closeChangePassword()">Cancel</button>
+            <button class="primary" onclick="submitPasswordChange()">Change</button>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH & FILTER MODAL -->
+<div class="login-modal" id="searchModal" onclick="closeSearchModal()">
+
+    <div class="login-box" style="max-width:500px;" onclick="event.stopPropagation()">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="login-title" data-translate="searchTitle">Search & Filter</div>
+    <button onclick="closeSearchModal()" 
+        style="background:none;border:none;font-size:24px;cursor:pointer;">
+        ✕
+    </button>
+</div>
+
+        
+        <label style="font-size:13px;font-weight:600;margin-bottom:4px;display:block;" data-translate="searchLabel">Search</label>
+        <input type="text" id="searchBox" class="login-input" placeholder="Search..." onkeyup="applyFilters()" data-translate-placeholder="searchPlaceholder">
+        
+        <label style="font-size:13px;font-weight:600;margin-bottom:4px;display:block;" data-translate="filterByDivision">Filter by Division</label>
+        <select id="filterDivision" onchange="applyFilters()" class="login-input" style="margin-bottom:12px;">
+            <option value="" data-translate="allDivisions">All Divisions</option>
+            <option>Kebaktian</option><option>Sekolah Minggu</option><option>11DG</option>
+            <option>Alive</option><option>Kaum Pria</option><option>Kaum Wanita</option>
+            <option>Kaum Lansia</option><option>Usher</option><option>Diakonia</option>
+            <option>Dept Injil</option><option>Dept Misi</option><option>AGBF</option>
+            <option>Kewirausahaan</option><option>Publikasi</option><option>Tata Graha</option>
+            <option>Fasilitas</option><option>Tim Doa</option><option>ESP</option>
+        </select>
+        
+        <label style="font-size:13px;font-weight:600;margin-bottom:4px;display:block;" data-translate="filterByRoom">Filter by Room</label>
+        <select id="filterRoom" onchange="applyFilters()" class="login-input" style="margin-bottom:12px;">
+            <option value="" data-translate="allRooms">All Rooms</option>
+            <option>Hall Utama</option><option>Ruang Kaca Lt2</option><option>Ruang SM Spesial</option>
+            <option>Ruang Youth Lt1</option><option>Office</option><option>Studio</option>
+        </select>
+        
+        <div id="filterResults" style="font-size:13px;color:#6b7280;margin-bottom:12px;text-align:center;">
+            <!-- Results count will be shown here -->
+        </div>
+        
+        <div class="login-buttons">
+            <button class="secondary" onclick="clearFilters()" data-translate="clearFilters">Clear All</button>
+            <button class="primary" onclick="closeSearchModal()" data-translate="applyButton">Apply</button>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-sheet" id="aboutSheet">
+    <div class="handle"></div>
+
+    <div class="sheet-title">About</div>
+	
+	<div style="color:#374151;line-height:1.7;font-size:16px">
+	
+	<b> GSJA Ekklesia Room Booking Website<br><br>
+
+    <div style="color:#374151;line-height:1.7;font-size:13px">
+
+        <b>Sistem ini digunakan untuk mengatur pemakaian ruangan 
+		secara terpusat agar jadwal kegiatan tetap rapi dan tidak saling bertabrakan.<br><br>
+
+			<b>Pilih tanggal di kalender untuk melihat atau membuat booking ,
+			lalu isi detail kegiatan agar jadwal dapat langsung tercatat dan 
+			diketahui bersama.<br><br>
+
+
+        <div style="
+            margin-top:18px;
+            padding-top:12px;
+            border-top:1px solid #e5e7eb;
+            font-size:28px;
+            color:#9ca3af;
+            cursor:pointer;
+            user-select:none;
+            text-align:center;"
+            id="easterEgg"
+            onclick="easterEggClick()">
+            🥪
+        </div>
+
+    </div>
+</div>
+
+<!-- Confetti Container for Easter Egg -->
+<div id="confettiContainer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></div>
+
+
+<script src="app.js" defer></script>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+    <span class="toast-icon" id="toastIcon">✓</span>
+    <span class="toast-message" id="toastMessage">Success!</span>
+</div>
+
+</body>
+</html>
