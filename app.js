@@ -526,17 +526,62 @@ const divisionHexColors = {
 // BUILD LEGEND
 function buildLegend() {
     const grid = document.getElementById('legendGrid');
+    const previewDots = document.getElementById('legendPreviewDots');
     if (!grid) return;
+
     grid.innerHTML = '';
-    Object.entries(divisionHexColors).forEach(([name, color], index) => {
+    if (previewDots) previewDots.innerHTML = '';
+
+    Object.entries(divisionHexColors).forEach(([name, color]) => {
+        // Main grid dot — hidden until accordion opens
         const item = document.createElement('div');
         item.className = 'legend-item';
         item.innerHTML = `
-            <span class="legend-dot" style="background:${color};animation-delay:${index * 40}ms"></span>
+            <span class="legend-dot" style="background:${color}"></span>
             <span>${name}</span>
         `;
         grid.appendChild(item);
+
+        // Small preview dot strip shown while collapsed
+        if (previewDots) {
+            const pd = document.createElement('span');
+            pd.className = 'legend-preview-dot';
+            pd.style.background = color;
+            previewDots.appendChild(pd);
+        }
     });
+}
+
+function toggleLegend() {
+    const wrap    = document.getElementById('legendWrap');
+    const trigger = document.getElementById('legendTrigger');
+    if (!wrap) return;
+    const isOpen = wrap.classList.contains('open');
+
+    if (isOpen) {
+        wrap.classList.remove('open');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        // Reset dots back to hidden
+        wrap.querySelectorAll('.legend-dot').forEach(d => {
+            d.classList.remove('popping', 'popped');
+        });
+    } else {
+        wrap.classList.add('open');
+        if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        // Stagger pop-in after grid has opened (slight delay for grid transition)
+        setTimeout(() => {
+            wrap.querySelectorAll('.legend-dot').forEach((dot, i) => {
+                dot.classList.remove('popping', 'popped');
+                setTimeout(() => {
+                    dot.classList.add('popping');
+                    dot.addEventListener('animationend', () => {
+                        dot.classList.remove('popping');
+                        dot.classList.add('popped');
+                    }, { once: true });
+                }, i * 45);
+            });
+        }, 120); // wait for accordion to start opening
+    }
 }
 
 // SHOW / HIDE EMPTY STATE

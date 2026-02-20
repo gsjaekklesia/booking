@@ -399,8 +399,24 @@
 
 <!-- DIVISION COLOR LEGEND -->
 <div class="legend-wrap" id="legendWrap">
-    <div class="legend-title">Warna Komisi</div>
-    <div class="legend-grid" id="legendGrid"></div>
+    <!-- Accordion trigger -->
+    <button class="legend-trigger" onclick="toggleLegend()" aria-expanded="false" id="legendTrigger">
+        <div class="legend-trigger-left">
+            <!-- Preview dots shown when collapsed -->
+            <div class="legend-preview-dots" id="legendPreviewDots"></div>
+            <span class="legend-title">Warna Komisi</span>
+        </div>
+        <!-- Animated chevron -->
+        <svg class="legend-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+        </svg>
+    </button>
+    <!-- Collapsible body -->
+    <div class="legend-body" id="legendBody">
+        <div class="legend-body-inner">
+            <div class="legend-grid" id="legendGrid"></div>
+        </div>
+    </div>
 </div>
 
 </div>
