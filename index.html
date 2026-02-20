@@ -371,6 +371,82 @@
 </div>
 
 
+<!-- DIVISION COLOR LEGEND (moved to top, between header and calendar) -->
+<div class="legend-wrap" id="legendWrap">
+    <!-- Accordion trigger -->
+    <button class="legend-trigger" onclick="toggleLegend()" aria-expanded="false" id="legendTrigger">
+        <span class="legend-title">Warna Komisi</span>
+        <svg class="legend-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+        </svg>
+    </button>
+    <!-- Collapsible body -->
+    <div class="legend-body" id="legendBody">
+        <div class="legend-body-inner">
+            <!-- Dove SVG scene (decorative) -->
+            <div class="dove-scene" aria-hidden="true">
+                <svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" class="dove-svg">
+                    <defs>
+                        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="var(--dove-sky-top)"/>
+                            <stop offset="100%" stop-color="var(--dove-sky-bot)"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Sky background -->
+                    <rect width="400" height="90" fill="url(#skyGrad)" rx="10"/>
+
+                    <!-- Dove 1 — large, leads the flock -->
+                    <g class="dove dove-1">
+                        <path d="M0 20 Q8 12 16 20 Q8 15 0 20Z" class="dove-wing-left"/>
+                        <path d="M16 20 Q24 12 32 20 Q24 15 16 20Z" class="dove-wing-right"/>
+                        <ellipse cx="16" cy="22" rx="7" ry="4" class="dove-body"/>
+                        <path d="M23 22 Q28 20 30 22 Q28 24 23 22Z" class="dove-tail"/>
+                        <circle cx="10" cy="21" r="1" class="dove-eye"/>
+                    </g>
+
+                    <!-- Dove 2 — medium, slightly behind -->
+                    <g class="dove dove-2">
+                        <path d="M0 20 Q6 13 12 20 Q6 16 0 20Z" class="dove-wing-left"/>
+                        <path d="M12 20 Q18 13 24 20 Q18 16 12 20Z" class="dove-wing-right"/>
+                        <ellipse cx="12" cy="22" rx="5.5" ry="3.2" class="dove-body"/>
+                        <path d="M17.5 22 Q22 20 24 22 Q22 24 17.5 22Z" class="dove-tail"/>
+                        <circle cx="8" cy="21" r="0.8" class="dove-eye"/>
+                    </g>
+
+                    <!-- Dove 3 — small, back of flock -->
+                    <g class="dove dove-3">
+                        <path d="M0 20 Q5 14 10 20 Q5 17 0 20Z" class="dove-wing-left"/>
+                        <path d="M10 20 Q15 14 20 20 Q15 17 10 20Z" class="dove-wing-right"/>
+                        <ellipse cx="10" cy="21.5" rx="4.5" ry="2.8" class="dove-body"/>
+                        <path d="M14.5 21.5 Q18 20 20 21.5 Q18 23 14.5 21.5Z" class="dove-tail"/>
+                        <circle cx="7" cy="21" r="0.7" class="dove-eye"/>
+                    </g>
+
+                    <!-- Dove 4 — tiny straggler -->
+                    <g class="dove dove-4">
+                        <path d="M0 20 Q4 15 8 20 Q4 17 0 20Z" class="dove-wing-left"/>
+                        <path d="M8 20 Q12 15 16 20 Q12 17 8 20Z" class="dove-wing-right"/>
+                        <ellipse cx="8" cy="21.5" rx="3.8" ry="2.4" class="dove-body"/>
+                        <path d="M11.8 21.5 Q15 20 16 21.5 Q15 23 11.8 21.5Z" class="dove-tail"/>
+                        <circle cx="5.5" cy="21" r="0.6" class="dove-eye"/>
+                    </g>
+
+                    <!-- Dove 5 — smallest, high up -->
+                    <g class="dove dove-5">
+                        <path d="M0 20 Q3 15 6 20 Q3 17 0 20Z" class="dove-wing-left"/>
+                        <path d="M6 20 Q9 15 12 20 Q9 17 6 20Z" class="dove-wing-right"/>
+                        <ellipse cx="6" cy="21.5" rx="3" ry="2" class="dove-body"/>
+                        <path d="M9 21.5 Q12 20 13 21.5 Q12 23 9 21.5Z" class="dove-tail"/>
+                        <circle cx="4" cy="21" r="0.5" class="dove-eye"/>
+                    </g>
+                </svg>
+            </div>
+            <!-- Color grid -->
+            <div class="legend-grid" id="legendGrid"></div>
+        </div>
+    </div>
+</div>
+
 <!-- SKELETON LOADER -->
 <div id="skeletonLoader" class="skeleton-wrap">
     <div class="skeleton-bar short"></div>
@@ -397,27 +473,7 @@
     <button class="empty-state-btn" onclick="openCreateSheet()">+ Buat Booking</button>
 </div>
 
-<!-- DIVISION COLOR LEGEND -->
-<div class="legend-wrap" id="legendWrap">
-    <!-- Accordion trigger -->
-    <button class="legend-trigger" onclick="toggleLegend()" aria-expanded="false" id="legendTrigger">
-        <div class="legend-trigger-left">
-            <!-- Preview dots shown when collapsed -->
-            <div class="legend-preview-dots" id="legendPreviewDots"></div>
-            <span class="legend-title">Warna Komisi</span>
-        </div>
-        <!-- Animated chevron -->
-        <svg class="legend-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-        </svg>
-    </button>
-    <!-- Collapsible body -->
-    <div class="legend-body" id="legendBody">
-        <div class="legend-body-inner">
-            <div class="legend-grid" id="legendGrid"></div>
-        </div>
-    </div>
-</div>
+
 
 </div>
 </div>

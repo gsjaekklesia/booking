@@ -1325,7 +1325,7 @@ button:active {
 
 /* ===== DIVISION LEGEND ===== */
 .legend-wrap {
-    margin-top: 20px;
+    margin-bottom: 16px;
     background: var(--surface);
     border-radius: 14px;
     border: 1px solid var(--border);
@@ -1333,13 +1333,13 @@ button:active {
     overflow: hidden;
 }
 
-/* Accordion trigger button */
+/* Accordion trigger */
 .legend-trigger {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
+    padding: 12px 16px;
     background: none;
     border: none;
     cursor: pointer;
@@ -1348,32 +1348,6 @@ button:active {
 
 .legend-trigger:hover {
     background: var(--surface2);
-}
-
-.legend-trigger-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Coloured dot strip preview */
-.legend-preview-dots {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    transition: opacity 0.3s ease;
-}
-
-.legend-preview-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.legend-wrap.open .legend-preview-dots {
-    opacity: 0;
-    pointer-events: none;
 }
 
 .legend-title {
@@ -1388,24 +1362,22 @@ button:active {
     color: #93c5fd;
 }
 
-/* Chevron — rotates when open */
+/* Chevron rotates on open */
 .legend-chevron {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     color: #2563eb;
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     flex-shrink: 0;
 }
 
-[data-theme="dark"] .legend-chevron {
-    color: #93c5fd;
-}
+[data-theme="dark"] .legend-chevron { color: #93c5fd; }
 
 .legend-wrap.open .legend-chevron {
     transform: rotate(90deg);
 }
 
-/* Collapsible grid — height animates */
+/* Collapsible body */
 .legend-body {
     display: grid;
     grid-template-rows: 0fr;
@@ -1425,20 +1397,163 @@ button:active {
     padding: 0 16px 16px;
 }
 
+/* ===== DOVE SCENE ===== */
+.dove-scene {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.dove-svg {
+    width: 100%;
+    height: 90px;
+    display: block;
+}
+
+/* Sky colors via CSS vars */
+:root {
+    --dove-sky-top: #dbeafe;
+    --dove-sky-bot: #eff6ff;
+}
+[data-theme="dark"] {
+    --dove-sky-top: #1e3a5f;
+    --dove-sky-bot: #0f172a;
+}
+
+/* Dove parts */
+.dove-body      { fill: white; }
+.dove-wing-left,
+.dove-wing-right { fill: white; opacity: 0.92; }
+.dove-tail      { fill: #e2e8f0; }
+.dove-eye       { fill: #475569; }
+
+[data-theme="dark"] .dove-body       { fill: #e2e8f0; }
+[data-theme="dark"] .dove-wing-left,
+[data-theme="dark"] .dove-wing-right { fill: #cbd5e1; }
+[data-theme="dark"] .dove-tail       { fill: #94a3b8; }
+[data-theme="dark"] .dove-eye        { fill: #1e293b; }
+
+/* Wing flap — alternates up/down */
+@keyframes flapLeft {
+    0%, 100% { transform: rotateX(0deg) scaleY(1); }
+    50%       { transform: rotateX(40deg) scaleY(0.5); }
+}
+@keyframes flapRight {
+    0%, 100% { transform: rotateX(0deg) scaleY(1); }
+    50%       { transform: rotateX(-40deg) scaleY(0.5); }
+}
+
+/* Dove flight paths — each dove flies across at different speeds/heights */
+@keyframes flyAcross1 {
+    0%   { transform: translate(-40px, 28px); }
+    100% { transform: translate(420px, 15px); }
+}
+@keyframes flyAcross2 {
+    0%   { transform: translate(-30px, 45px); }
+    100% { transform: translate(420px, 35px); }
+}
+@keyframes flyAcross3 {
+    0%   { transform: translate(-25px, 60px); }
+    100% { transform: translate(420px, 50px); }
+}
+@keyframes flyAcross4 {
+    0%   { transform: translate(-20px, 38px); }
+    100% { transform: translate(420px, 25px); }
+}
+@keyframes flyAcross5 {
+    0%   { transform: translate(-15px, 20px); }
+    100% { transform: translate(420px, 10px); }
+}
+
+.dove-1 {
+    animation: flyAcross1 7s linear infinite;
+}
+.dove-2 {
+    animation: flyAcross2 9s linear infinite;
+    animation-delay: -3s;
+}
+.dove-3 {
+    animation: flyAcross3 11s linear infinite;
+    animation-delay: -6s;
+}
+.dove-4 {
+    animation: flyAcross4 8s linear infinite;
+    animation-delay: -1.5s;
+}
+.dove-5 {
+    animation: flyAcross5 13s linear infinite;
+    animation-delay: -9s;
+}
+
+/* Wing flap on each dove */
+.dove-1 .dove-wing-left  { animation: flapLeft  0.45s ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-1 .dove-wing-right { animation: flapRight 0.45s ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-2 .dove-wing-left  { animation: flapLeft  0.5s  ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-2 .dove-wing-right { animation: flapRight 0.5s  ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-3 .dove-wing-left  { animation: flapLeft  0.55s ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-3 .dove-wing-right { animation: flapRight 0.55s ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-4 .dove-wing-left  { animation: flapLeft  0.4s  ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-4 .dove-wing-right { animation: flapRight 0.4s  ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-5 .dove-wing-left  { animation: flapLeft  0.6s  ease-in-out infinite; transform-origin: 50% 100%; }
+.dove-5 .dove-wing-right { animation: flapRight 0.6s  ease-in-out infinite; transform-origin: 50% 100%; }
+
+/* Pause animations when accordion is closed (performance) */
+.legend-wrap:not(.open) .dove-1,
+.legend-wrap:not(.open) .dove-2,
+.legend-wrap:not(.open) .dove-3,
+.legend-wrap:not(.open) .dove-4,
+.legend-wrap:not(.open) .dove-5 {
+    animation-play-state: paused;
+}
+
+/* ===== LEGEND GRID — SHIMMER CARDS ===== */
 .legend-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 8px;
-    padding-top: 4px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--text-secondary);
-    font-weight: 500;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.legend-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Shimmer sweep on open */
+.legend-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.legend-item.shimmer::after {
+    animation: shimmerSweep 0.6s ease forwards;
+}
+
+@keyframes shimmerSweep {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
 }
 
 .legend-dot {
@@ -1456,7 +1571,6 @@ button:active {
     transform: scale(1);
 }
 
-/* Legend dot pop keyframe for overshoot */
 @keyframes dotPopIn {
     0%   { transform: scale(0); opacity: 0; }
     70%  { transform: scale(1.4); opacity: 1; }

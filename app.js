@@ -526,14 +526,10 @@ const divisionHexColors = {
 // BUILD LEGEND
 function buildLegend() {
     const grid = document.getElementById('legendGrid');
-    const previewDots = document.getElementById('legendPreviewDots');
     if (!grid) return;
-
     grid.innerHTML = '';
-    if (previewDots) previewDots.innerHTML = '';
 
     Object.entries(divisionHexColors).forEach(([name, color]) => {
-        // Main grid dot — hidden until accordion opens
         const item = document.createElement('div');
         item.className = 'legend-item';
         item.innerHTML = `
@@ -541,14 +537,6 @@ function buildLegend() {
             <span>${name}</span>
         `;
         grid.appendChild(item);
-
-        // Small preview dot strip shown while collapsed
-        if (previewDots) {
-            const pd = document.createElement('span');
-            pd.className = 'legend-preview-dot';
-            pd.style.background = color;
-            previewDots.appendChild(pd);
-        }
     });
 }
 
@@ -561,26 +549,36 @@ function toggleLegend() {
     if (isOpen) {
         wrap.classList.remove('open');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
-        // Reset dots back to hidden
+        // Reset items and dots
+        wrap.querySelectorAll('.legend-item').forEach(el => {
+            el.classList.remove('visible', 'shimmer');
+        });
         wrap.querySelectorAll('.legend-dot').forEach(d => {
             d.classList.remove('popping', 'popped');
         });
     } else {
         wrap.classList.add('open');
         if (trigger) trigger.setAttribute('aria-expanded', 'true');
-        // Stagger pop-in after grid has opened (slight delay for grid transition)
+
+        // After grid starts opening, stagger cards + dots
         setTimeout(() => {
-            wrap.querySelectorAll('.legend-dot').forEach((dot, i) => {
-                dot.classList.remove('popping', 'popped');
+            wrap.querySelectorAll('.legend-item').forEach((item, i) => {
                 setTimeout(() => {
-                    dot.classList.add('popping');
-                    dot.addEventListener('animationend', () => {
-                        dot.classList.remove('popping');
-                        dot.classList.add('popped');
-                    }, { once: true });
-                }, i * 45);
+                    item.classList.add('visible');
+                    // Shimmer sweep
+                    setTimeout(() => item.classList.add('shimmer'), 80);
+                    // Dot pop
+                    const dot = item.querySelector('.legend-dot');
+                    if (dot) {
+                        dot.classList.add('popping');
+                        dot.addEventListener('animationend', () => {
+                            dot.classList.remove('popping');
+                            dot.classList.add('popped');
+                        }, { once: true });
+                    }
+                }, i * 55);
             });
-        }, 120); // wait for accordion to start opening
+        }, 150);
     }
 }
 
