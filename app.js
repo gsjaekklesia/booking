@@ -595,7 +595,7 @@ function renderCalendar() {
         selectLongPressDelay: 250,
         selectMinDistance: 5,
         initialView: 'dayGridMonth',  // Always start with month view
-        selectable: true,
+        selectable: false,
         unselectAuto: false,
         selectMirror: true,
         headerToolbar: {
@@ -619,25 +619,6 @@ function renderCalendar() {
         
         // Better spacing for multiple events
         slotMinWidth: 50,
-
-        select(info) {
-            isAllDay = info.allDay;
-            tempStart = info.startStr;
-            tempEnd = info.endStr;
-            openCreateSheet();
-
-            const adjust = document.getElementById('timeAdjust');
-            if (isAllDay) {
-                adjust.style.display = 'block';
-            } else {
-                adjust.style.display = 'none';
-            }
-            
-            document.getElementById('selectedTime').innerText =
-                isAllDay
-                    ? `Tanggal: ${new Date(tempStart).toLocaleDateString()} → ${new Date(tempEnd).toLocaleDateString()}`
-                    : `Time: ${new Date(tempStart).toLocaleString()} → ${new Date(tempEnd).toLocaleString()}`;
-        },
 
         eventClick(info) {
             const bookingId = info.event.extendedProps.bookingId;
@@ -923,17 +904,37 @@ function openCreateSheet() {
     createSheet.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    // Set today's date as default in manual date picker
+    // Set today's date as default
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
-    document.getElementById('manualDate').value = `${yyyy}-${mm}-${dd}`;
-    
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('manualDate').value = todayStr;
+    document.getElementById('manualEndDate').value = todayStr;
+
+    // Reset multi-day checkbox
+    const multiCheck = document.getElementById('multiDayCheck');
+    const endDateContainer = document.getElementById('endDateContainer');
+    if (multiCheck) multiCheck.checked = false;
+    if (endDateContainer) endDateContainer.style.display = 'none';
+
     // Show silent mode checkbox only for admins
     const silentModeContainer = document.getElementById('silentModeContainer');
     if (silentModeContainer) {
         silentModeContainer.style.display = isAdmin ? 'block' : 'none';
+    }
+}
+
+function toggleMultiDay() {
+    const checked = document.getElementById('multiDayCheck').checked;
+    const endDateContainer = document.getElementById('endDateContainer');
+    endDateContainer.style.display = checked ? 'block' : 'none';
+
+    // Set end date to match start date when first expanding
+    if (checked) {
+        const startVal = document.getElementById('manualDate').value;
+        if (startVal) document.getElementById('manualEndDate').value = startVal;
     }
 }
 
@@ -1201,49 +1202,28 @@ async function createBooking() {
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
 
-    // Check if using manual date/time OR calendar selection
-    let start, end;
-    
-    if (manualDate && startTime && endTime) {
-        // Manual input mode — always use WIB (UTC+7) to match calendar selection
-        start = `${manualDate}T${startTime}:00+07:00`;
-        end = `${manualDate}T${endTime}:00+07:00`;
-    } else if (tempStart && tempEnd) {
-        // Calendar selection mode
-        start = tempStart;
-        end = tempEnd;
-        
-        // If it's an all-day selection, apply the custom times
-        if (isAllDay) {
-            let startDateStr = tempStart;
-            let endDateStr = tempEnd;
-            
-            if (startDateStr.includes('T')) {
-                startDateStr = startDateStr.split('T')[0];
-            }
-            if (endDateStr.includes('T')) {
-                endDateStr = endDateStr.split('T')[0];
-        }
-        
-        // For all-day events, FullCalendar gives us end date as next day at midnight
-            
-            // So we need to subtract one day to get the actual last day
-            const endDateParts = endDateStr.split('-');
-            const endDateObj = new Date(parseInt(endDateParts[0]), parseInt(endDateParts[1]) - 1, parseInt(endDateParts[2]));
-            endDateObj.setDate(endDateObj.getDate() - 1);
-            const actualEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
-            
-            // Create timestamps in Indonesia timezone (WIB = UTC+7)
-            start = `${startDateStr}T${startTime}:00+07:00`;
-            end = `${actualEndDate}T${endTime}:00+07:00`;
-            
-            console.log('Multi-day booking created:', {start, end});
-        }
-    } else {
-        // No date/time selected at all
-        alert('Mohon pilih tanggal dan jam (dari kalender atau isi manual).');
+    // Check if multi-day booking
+    const isMultiDay = document.getElementById('multiDayCheck').checked;
+    const endDateStr = isMultiDay
+        ? document.getElementById('manualEndDate').value
+        : manualDate;
+
+    // Validate dates
+    if (!manualDate || !startTime || !endTime) {
+        alert('Mohon lengkapi tanggal dan jam.');
         return;
     }
+    if (isMultiDay && !endDateStr) {
+        alert('Mohon lengkapi Tanggal Selesai untuk booking multi-hari.');
+        return;
+    }
+    if (isMultiDay && endDateStr < manualDate) {
+        alert('Tanggal Selesai tidak boleh sebelum Tanggal Mulai.');
+        return;
+    }
+
+    let start = `${manualDate}T${startTime}:00+07:00`;
+    let end   = `${endDateStr}T${endTime}:00+07:00`;
     
     // Validate required fields
     if (!division || !room || !activity) {
