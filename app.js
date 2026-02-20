@@ -1577,13 +1577,7 @@ function initTimeScene() {
     const wrap = document.getElementById('timeScene');
     if (wrap) {
         // Remove existing label if any
-        const existing = wrap.querySelector('.scene-label');
-        if (existing) existing.remove();
 
-        const label = document.createElement('div');
-        label.className = 'scene-label';
-        label.textContent = getSceneLabel();
-        wrap.appendChild(label);
     }
 }
 
