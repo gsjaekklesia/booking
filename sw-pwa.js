@@ -1,6 +1,6 @@
 // PWA Service Worker for GSJA Ekklesia Room Booking
 // Updated: 2026-02-19 - Login page + Dark mode + Legend + Empty state
-const CACHE_NAME = 'gsja-booking-v2.2.7';
+const CACHE_NAME = 'gsja-booking-v2.2.8';
 const urlsToCache = [
   './',
   './index.html',
