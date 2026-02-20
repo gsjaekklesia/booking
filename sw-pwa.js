@@ -1,6 +1,6 @@
 // PWA Service Worker for GSJA Ekklesia Room Booking
 // Updated: 2026-02-20 - Separated CSS and JS into external files
-const CACHE_NAME = 'gsja-booking-v2.6.2';
+const CACHE_NAME = 'gsja-booking-v2.6.3';
 const urlsToCache = [
   './',
   './index.html',
