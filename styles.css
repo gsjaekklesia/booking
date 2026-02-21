@@ -1365,16 +1365,16 @@ button:active {
     opacity: 0.95;
 }
 
-/* CSS vars for dove/sky colors */
+/* CSS vars for cloud/sky colors */
 :root {
-    --dove-sky-top: #dbeafe;
-    --dove-sky-bot: #eff6ff;
-    --dove-color: rgba(37,99,235,0.45);
+    --dove-sky-top: #bfdbfe;
+    --dove-sky-bot: #e0f2fe;
+    --cloud-color: rgba(255,255,255,0.9);
 }
 [data-theme="dark"] {
     --dove-sky-top: #1e3a5f;
     --dove-sky-bot: #0f172a;
-    --dove-color: rgba(147,197,253,0.5);
+    --cloud-color: rgba(148,163,184,0.3);
 }
 
 .legend-title {
@@ -1429,22 +1429,22 @@ button:active {
     padding: 0 16px 16px;
 }
 
-/* ===== DOVE FLIGHT ANIMATIONS ===== */
-@keyframes flyAcross1 { from { transform: translate(-30px, 14px); } to { transform: translate(430px, 8px);  } }
-@keyframes flyAcross2 { from { transform: translate(-25px, 28px); } to { transform: translate(430px, 20px); } }
-@keyframes flyAcross3 { from { transform: translate(-20px, 8px);  } to { transform: translate(430px, 18px); } }
-@keyframes flyAcross4 { from { transform: translate(-18px, 32px); } to { transform: translate(430px, 28px); } }
-@keyframes flyAcross5 { from { transform: translate(-15px, 18px); } to { transform: translate(430px, 10px); } }
-@keyframes flyAcross6 { from { transform: translate(-12px, 36px); } to { transform: translate(430px, 30px); } }
+/* ===== CLOUD DRIFT ANIMATIONS ===== */
+@keyframes flyAcross1 { from { transform: translate(-60px, 8px);  } to { transform: translate(460px, 6px);  } }
+@keyframes flyAcross2 { from { transform: translate(-50px, 22px); } to { transform: translate(460px, 20px); } }
+@keyframes flyAcross3 { from { transform: translate(-40px, 6px);  } to { transform: translate(460px, 10px); } }
+@keyframes flyAcross4 { from { transform: translate(-55px, 28px); } to { transform: translate(460px, 24px); } }
+@keyframes flyAcross5 { from { transform: translate(-35px, 14px); } to { transform: translate(460px, 12px); } }
+@keyframes flyAcross6 { from { transform: translate(-45px, 30px); } to { transform: translate(460px, 28px); } }
 
-.dove-1 { animation: flyAcross1 8s  linear infinite; }
-.dove-2 { animation: flyAcross2 11s linear infinite; animation-delay: -4s;  }
-.dove-3 { animation: flyAcross3 9s  linear infinite; animation-delay: -7s;  }
-.dove-4 { animation: flyAcross4 13s linear infinite; animation-delay: -2s;  }
-.dove-5 { animation: flyAcross5 10s linear infinite; animation-delay: -9s;  }
-.dove-6 { animation: flyAcross6 15s linear infinite; animation-delay: -5s;  }
+.dove-1 { animation: flyAcross1 18s linear infinite; }
+.dove-2 { animation: flyAcross2 24s linear infinite; animation-delay: -8s;  }
+.dove-3 { animation: flyAcross3 20s linear infinite; animation-delay: -14s; }
+.dove-4 { animation: flyAcross4 28s linear infinite; animation-delay: -5s;  }
+.dove-5 { animation: flyAcross5 22s linear infinite; animation-delay: -19s; }
+.dove-6 { animation: flyAcross6 30s linear infinite; animation-delay: -11s; }
 
-/* Always play — doves are in the button, always visible */
+/* Always play — clouds are in the button */
 
 /* ===== LEGEND GRID — SHIMMER CARDS ===== */
 .legend-grid {
