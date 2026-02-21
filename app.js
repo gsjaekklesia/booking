@@ -521,7 +521,8 @@ const divisionHexColors = {
     'Tata Graha':    '#06b6d4',
     'Fasilitas':     '#64748b',
     'Tim Doa':       '#f43f5e',
-    'ESP':           '#8b5cf6'
+    'ESP':           '#8b5cf6',
+    'Lainnya':       '#d4e614'
 };
 
 // BUILD LEGEND
