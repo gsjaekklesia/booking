@@ -33,6 +33,22 @@
 <div class="wrapper">
 <div class="card">
 
+<!-- Pull to refresh indicator -->
+<div id="pullIndicator" class="pull-indicator" aria-hidden="true">
+    <div class="pull-cloud">
+        <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="24" cy="20" rx="20" ry="10" fill="currentColor" opacity="0.9"/>
+            <ellipse cx="14" cy="22" rx="12" ry="8"  fill="currentColor" opacity="0.9"/>
+            <ellipse cx="34" cy="22" rx="13" ry="8"  fill="currentColor" opacity="0.9"/>
+        </svg>
+    </div>
+    <svg class="pull-spinner" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-opacity="0.2"/>
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-dasharray="20 57" class="pull-arc"/>
+    </svg>
+</div>
+
 <div class="header">
     <!-- Scene background layer -->
     <div id="timeScene" class="time-scene" aria-hidden="true">

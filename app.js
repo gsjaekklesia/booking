@@ -952,6 +952,89 @@ function closeHint() {
 }
 
 // TOAST NOTIFICATION FUNCTIONS
+// ===== SUCCESS BURST ANIMATION =====
+function showSuccessBurst() {
+    const fab = document.querySelector('.fab');
+    if (!fab) return;
+
+    const rect = fab.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top  + rect.height / 2;
+
+    const burst = document.createElement('div');
+    burst.className = 'success-burst';
+    burst.style.cssText = `left:${cx}px; top:${cy}px; transform:translate(-50%,-50%)`;
+    burst.innerHTML = `
+        <div class="success-ring"></div>
+        <div class="success-ring"></div>
+        <div class="success-check">
+            <svg viewBox="0 0 24 24"><polyline points="4,13 9,18 20,7"/></svg>
+        </div>`;
+    document.body.appendChild(burst);
+
+    // Fade out and remove after animation
+    setTimeout(() => burst.classList.add('burst-fade'), 900);
+    setTimeout(() => burst.remove(), 1300);
+}
+
+// ===== PULL TO REFRESH =====
+function initPullToRefresh() {
+    const card = document.querySelector('.card');
+    const indicator = document.getElementById('pullIndicator');
+    if (!card || !indicator) return;
+
+    let startY = 0;
+    let isPulling = false;
+    let isRefreshing = false;
+    const threshold = 80;
+
+    document.addEventListener('touchstart', (e) => {
+        // Only trigger if scrolled to top
+        if (window.scrollY > 0) return;
+        startY = e.touches[0].clientY;
+        isPulling = true;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isPulling || isRefreshing) return;
+        const deltaY = e.touches[0].clientY - startY;
+        if (deltaY < 10) return;
+
+        const progress = Math.min(deltaY / threshold, 1);
+        const topOffset = -70 + (progress * 86);
+        indicator.style.top = `${topOffset}px`;
+        indicator.classList.add('pull-visible');
+    }, { passive: true });
+
+    document.addEventListener('touchend', async () => {
+        if (!isPulling || isRefreshing) return;
+        isPulling = false;
+
+        const currentTop = parseInt(indicator.style.top || '-70');
+        if (currentTop >= 16) {
+            // Trigger refresh
+            isRefreshing = true;
+            indicator.style.top = '';
+            indicator.classList.add('pull-refreshing');
+            haptic('light');
+
+            try {
+                await loadBookings();
+            } finally {
+                setTimeout(() => {
+                    indicator.classList.remove('pull-refreshing', 'pull-visible');
+                    indicator.style.top = '';
+                    isRefreshing = false;
+                }, 600);
+            }
+        } else {
+            // Snap back
+            indicator.classList.remove('pull-visible');
+            indicator.style.top = '';
+        }
+    });
+}
+
 function showToast(message, type = 'success', icon = '✓') {
     const toast = document.getElementById('toast');
     const toastIcon = document.getElementById('toastIcon');
@@ -1369,6 +1452,7 @@ async function createBooking() {
     if (success) {
         await loadBookings();
         closeSheets();
+        showSuccessBurst(); // 🎉 success animation from FAB
         
         // Clear manual inputs
         document.getElementById('manualDate').value = '';
@@ -1532,6 +1616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Init swipe to close on all bottom sheets
     initSwipeToClose();
+    initPullToRefresh();
 
     // Init time of day scene
     startSceneClock();
