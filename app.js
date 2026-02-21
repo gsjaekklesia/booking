@@ -148,6 +148,7 @@ let selectedBookingId = null;
 let tempStart = null;
 let tempEnd = null;
 let isAllDay = false;
+let lastClickedDate = null; // stores date from dateClick for pre-filling form
 
 console.log('Variables initialized');
 
@@ -691,12 +692,8 @@ function renderCalendar() {
         },
 
         dateClick(info) {
-            // Pre-fill the date in create form
-            document.getElementById('manualDate').value = info.dateStr;
-            const manualEndDate = document.getElementById('manualEndDate');
-            if (manualEndDate && !document.getElementById('multiDayCheck').checked) {
-                manualEndDate.value = info.dateStr;
-            }
+            // Store clicked date for pre-filling form when + is tapped
+            lastClickedDate = info.dateStr;
             // Show animated date chip
             showDateChip(info.date);
         },
@@ -985,14 +982,16 @@ function openCreateSheet() {
     createSheet.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    // Set today's date as default
+    // Use last clicked calendar date if available, otherwise today
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
-    document.getElementById('manualDate').value = todayStr;
-    document.getElementById('manualEndDate').value = todayStr;
+    const dateToUse = lastClickedDate || todayStr;
+
+    document.getElementById('manualDate').value = dateToUse;
+    document.getElementById('manualEndDate').value = dateToUse;
 
     // Reset multi-day checkbox
     const multiCheck = document.getElementById('multiDayCheck');
@@ -1133,13 +1132,14 @@ function initSwipeToClose() {
         let isDragging = false;
 
         sheet.addEventListener('touchstart', (e) => {
-            // Only start swipe if touch is on handle or top 40px of sheet
             const touchY = e.touches[0].clientY;
             const sheetTop = sheet.getBoundingClientRect().top;
-            if (touchY - sheetTop > 60) return; // Only drag from top area
+            if (touchY - sheetTop > 60) return;
 
             startY = e.touches[0].clientY;
             isDragging = true;
+            // Disable transition while dragging so sheet follows finger instantly
+            sheet.style.transition = 'none';
             sheet.classList.add('is-dragging');
         }, { passive: true });
 
@@ -1147,7 +1147,7 @@ function initSwipeToClose() {
             if (!isDragging) return;
             currentY = e.touches[0].clientY;
             const deltaY = currentY - startY;
-            if (deltaY < 0) return; // Don't allow dragging up
+            if (deltaY < 0) return;
             sheet.style.transform = `translateY(${deltaY}px)`;
         }, { passive: true });
 
@@ -1158,16 +1158,20 @@ function initSwipeToClose() {
             const deltaY = currentY - startY;
 
             if (deltaY > 100) {
-                // Swiped down far enough — close
+                // Swiped far enough — animate close then reset
+                sheet.style.transition = 'transform 0.25s ease';
                 sheet.style.transform = `translateY(100%)`;
                 haptic('medium');
                 setTimeout(() => {
+                    sheet.style.transition = '';
                     sheet.style.transform = '';
                     closeSheets();
-                }, 250);
+                }, 260);
             } else {
-                // Snap back
+                // Snap back smoothly
+                sheet.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 sheet.style.transform = '';
+                setTimeout(() => { sheet.style.transition = ''; }, 300);
             }
             startY = 0;
             currentY = 0;
