@@ -690,6 +690,17 @@ function renderCalendar() {
             });
         },
 
+        dateClick(info) {
+            // Pre-fill the date in create form
+            document.getElementById('manualDate').value = info.dateStr;
+            const manualEndDate = document.getElementById('manualEndDate');
+            if (manualEndDate && !document.getElementById('multiDayCheck').checked) {
+                manualEndDate.value = info.dateStr;
+            }
+            // Show animated date chip
+            showDateChip(info.date);
+        },
+
         eventClick(info) {
             const bookingId = info.event.extendedProps.bookingId;
             const booking = bookings.find(b => b.id === bookingId);
@@ -1023,29 +1034,70 @@ function openViewSheet(b) {
     const startDate = new Date(b.start);
     const endDate   = new Date(b.end);
 
-    const options = {
+    const dateOpts = {
         timeZone: 'Asia/Jakarta',
-        year:     'numeric',
-        month:    '2-digit',
-        day:      '2-digit',
+        weekday:  'short',
+        day:      'numeric',
+        month:    'short',
+        year:     'numeric'
+    };
+    const timeOpts = {
+        timeZone: 'Asia/Jakarta',
         hour:     '2-digit',
         minute:   '2-digit',
-        hour12:   true
+        hour12:   false
     };
 
-    const startStr = startDate.toLocaleString('en-US', options);
-    const endStr   = endDate.toLocaleString('en-US', options);
+    const startDateStr = startDate.toLocaleDateString('id-ID', dateOpts);
+    const endDateStr   = endDate.toLocaleDateString('id-ID', dateOpts);
+    const startTimeStr = startDate.toLocaleTimeString('id-ID', timeOpts);
+    const endTimeStr   = endDate.toLocaleTimeString('id-ID', timeOpts);
+    const isMultiDay   = startDateStr !== endDateStr;
+
+    // Duration calc
+    const diffMs  = endDate - startDate;
+    const diffH   = Math.floor(diffMs / 3600000);
+    const diffM   = Math.round((diffMs % 3600000) / 60000);
+    const duration = diffH > 0
+        ? `${diffH}j${diffM > 0 ? ` ${diffM}m` : ''}`
+        : `${diffM}m`;
 
     modalBody.innerHTML = `
-<div style="display:flex;flex-direction:column;gap:6px;">
-  <div style="display:flex;align-items:center;gap:8px;">
-    <span style="width:8px;height:8px;border-radius:50%;background:${hex};flex-shrink:0;"></span>
-    <span><b>Divisi:</b> ${b.division}</span>
-  </div>
-  <div><b>Room:</b> ${b.room}</div>
-  <div><b>Mulai:</b> ${startStr} WIB</div>
-  <div><b>Selesai:</b> ${endStr} WIB</div>
-  ${b.notes ? `<div style="margin-top:8px;padding:10px 12px;background:var(--surface);border-radius:8px;font-size:14px;line-height:1.6;border-left:3px solid ${hex};">${b.notes}</div>` : ''}
+<div class="booking-card" style="--card-accent:${hex}">
+    <!-- Division row -->
+    <div class="booking-card-division">
+        <span class="booking-division-dot" style="background:${hex}"></span>
+        <span class="booking-division-name">${b.division}</span>
+        <span class="booking-room-badge">${b.room}</span>
+    </div>
+
+    <!-- Time block -->
+    <div class="booking-card-time">
+        <div class="booking-time-col">
+            <div class="booking-time-label">Mulai</div>
+            <div class="booking-time-value">${startTimeStr}</div>
+            <div class="booking-date-value">${startDateStr}</div>
+        </div>
+        <div class="booking-time-arrow">
+            <svg viewBox="0 0 40 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="0" y1="8" x2="32" y2="8" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <polyline points="26,2 34,8 26,14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <span class="booking-duration">${duration}</span>
+        </div>
+        <div class="booking-time-col booking-time-col-end">
+            <div class="booking-time-label">Selesai</div>
+            <div class="booking-time-value">${endTimeStr}</div>
+            <div class="booking-date-value">${isMultiDay ? endDateStr : ''}</div>
+        </div>
+    </div>
+
+    ${b.notes ? `
+    <!-- Notes -->
+    <div class="booking-card-notes">
+        <div class="booking-notes-label">Catatan</div>
+        <div class="booking-notes-text">${b.notes}</div>
+    </div>` : ''}
 </div>`;
 
     adminBtns.style.display = isAdmin ? 'flex' : 'none';
@@ -1593,6 +1645,36 @@ const sceneConfig = [
     { id: 'sceneEvening',   label: 'Evening',   start: 15, end: 18 },
     { id: 'sceneNight',     label: 'Night',      start: 18, end: 29 }, // 29 = next day 5am
 ];
+
+// ===== DATE CHIP =====
+let dateChipTimer = null;
+
+function showDateChip(date) {
+    const chip = document.getElementById('dateChip');
+    if (!chip) return;
+
+    // Format: "Senin, 21 Feb 2026"
+    const formatted = date.toLocaleDateString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        weekday: 'long',
+        day:     'numeric',
+        month:   'short',
+        year:    'numeric'
+    });
+
+    chip.textContent = formatted;
+
+    // Reset animation by removing and re-adding class
+    chip.classList.remove('date-chip-show');
+    void chip.offsetWidth; // force reflow
+    chip.classList.add('date-chip-show');
+
+    // Auto-hide after 2.5s
+    clearTimeout(dateChipTimer);
+    dateChipTimer = setTimeout(() => {
+        chip.classList.remove('date-chip-show');
+    }, 2500);
+}
 
 function getTimeScene() {
     const hour = new Date().getHours();
