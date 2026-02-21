@@ -317,9 +317,101 @@ body.page-leaving {
         font-size: 21px;
     }
 }
-</style>
+
+/* ===== M3 SPLASH SCREEN ===== */
+#splashScreen {
+    position: fixed;
+    inset: 0;
+    background: #1a1f3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#splashScreen.splash-hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    animation: splashFadeIn 0.6s ease both;
+}
+
+@keyframes splashFadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.splash-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.35;
+    letter-spacing: -0.3px;
+}
+
+/* Material 3 circular progress */
+.m3-progress {
+    width: 48px;
+    height: 48px;
+}
+
+.m3-spinner {
+    width: 48px;
+    height: 48px;
+    animation: m3Rotate 1.4s linear infinite;
+}
+
+@keyframes m3Rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.m3-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.12);
+    stroke-width: 4;
+}
+
+.m3-arc {
+    fill: none;
+    stroke: #6ea8fe;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 80 126;
+    animation: m3Arc 1.4s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes m3Arc {
+    0%   { stroke-dasharray: 1 125;   stroke-dashoffset: 0; }
+    50%  { stroke-dasharray: 100 125; stroke-dashoffset: -30; }
+    100% { stroke-dasharray: 1 125;   stroke-dashoffset: -126; }
+}</style>
 </head>
 <body>
+
+<!-- ===== M3 SPLASH SCREEN ===== -->
+<div id="splashScreen">
+    <div class="splash-content">
+        <div class="splash-title">GSJA Ekklesia<br>Booking System</div>
+        <!-- Material 3 circular progress indicator -->
+        <div class="m3-progress">
+            <svg class="m3-spinner" viewBox="0 0 48 48">
+                <circle class="m3-track" cx="24" cy="24" r="20"/>
+                <circle class="m3-arc"   cx="24" cy="24" r="20"/>
+            </svg>
+        </div>
+    </div>
+</div>
 
 <!-- Theme Toggle (top-left) -->
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">
@@ -388,6 +480,28 @@ function toggleTheme() {
         applyTheme('dark');
     } else {
         applyTheme('light');
+    }
+})();
+
+// ===== SPLASH DISMISS =====
+(function initSplash() {
+    const splash = document.getElementById('splashScreen');
+    if (!splash) return;
+    // Show for min 1.5s then fade out
+    const minTime = 1500;
+    const start   = Date.now();
+    function dismiss() {
+        const elapsed = Date.now() - start;
+        const delay   = Math.max(0, minTime - elapsed);
+        setTimeout(() => {
+            splash.classList.add('splash-hide');
+            setTimeout(() => splash.remove(), 500);
+        }, delay);
+    }
+    if (document.readyState === 'complete') {
+        dismiss();
+    } else {
+        window.addEventListener('load', dismiss, { once: true });
     }
 })();
 
